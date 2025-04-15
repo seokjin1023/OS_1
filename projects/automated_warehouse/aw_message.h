@@ -5,7 +5,8 @@
  * For easy to implement, combine robot and central control node message
  * If you want to modify message structure, don't split it
  */
-struct message {
+struct message
+{
     //
     // To central control node
     //
@@ -25,10 +26,11 @@ struct message {
     int cmd;
 };
 
-/** 
+/**
  * Simple message box which can receive only one message from sender
-*/
-struct messsage_box {
+ */
+struct messsage_box
+{
     /** check if the message was written by others */
     int dirtyBit;
     /** stored message */
@@ -36,8 +38,8 @@ struct messsage_box {
 };
 
 /** message boxes from central control node to each robot */
-extern struct messsage_box* boxes_from_central_control_node;
+extern struct messsage_box *boxes_from_central_control_node;
 /** message boxes from robots to central control node */
-extern struct messsage_box* boxes_from_robots;
+extern struct messsage_box *boxes_from_robots;
 
 #endif
