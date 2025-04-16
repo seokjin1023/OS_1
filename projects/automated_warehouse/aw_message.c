@@ -15,3 +15,5 @@ void init_message_boxes(int robot_num) {
         boxes_from_robots[i].dirtyBit = 0;
     }
 }
+
+
