@@ -22,6 +22,9 @@ struct list blocked_threads;
 void block_thread(struct robot *robot)
 {
     printf("block thread\n");
+    printf("block thread (list_empty: %d)\n", list_empty(&blocked_threads));
+    printf("list_begin: %p, list_end: %p\n", list_begin(&blocked_threads), list_end(&blocked_threads));
+
     enum intr_level old_level;
 
     ASSERT(robot != NULL);
@@ -41,6 +44,9 @@ void block_thread(struct robot *robot)
 void unblock_threads()
 {
     printf("unblock threads\n");
+    printf("block thread (list_empty: %d)\n", list_empty(&blocked_threads));
+    printf("list_begin: %p, list_end: %p\n", list_begin(&blocked_threads), list_end(&blocked_threads));
+
     struct list_elem *e;
 
     for (e = list_begin(&blocked_threads); e != list_end(&blocked_threads); e = list_next(e))

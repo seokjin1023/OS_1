@@ -30,19 +30,26 @@ char *my_strdup(const char *s)
 
 
 //cmt에서 보낸 값을 모두 읽었다고 했을 때 boolean으로 확인해주는 함수
-bool robot_all_move() {
-    for(int i = 0; i < robot_num; i++) {
-        if(boxes_from_central_control_node[i].dirtyBit == 1)
-            return false;
+bool robot_all_move()
+{
+    for (int i = 0; i < robot_num; i++) {
+        printf("[robot_all_move] checking robot %d...\n", i);
+        ASSERT(boxes_from_robots != NULL);  // 🔥 NULL이면 바로 잡힘
+        printf("[robot_all_move] dirtyBit[%d] = %d\n", i, boxes_from_robots[i].dirtyBit);
+        if (!boxes_from_robots[i].dirtyBit) return false;
     }
     return true;
 }
 //central control node thread
 void cnt()
 {
+    printf("cnt executed\n");
+    printf("[DEBUG] robot_num = %d\n", robot_num);
+    printf("[DEBUG] boxes_from_robots ptr = %p\n", boxes_from_robots);
+    printf("[DEBUG] boxes[0].dirtyBit = %d\n", boxes_from_robots[0].dirtyBit); // 💥 여기서 터지면 100% 확정
     while(1)
     {
-        //semaphore로 대기했다가 로봇이 데이터를 보낼 때마다 확인인
+        //semaphore로 대기했다가 로봇이 데이터를 보낼 때마다 확인
         sema_down(&cnt_sema);
 
         //check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
@@ -64,6 +71,7 @@ void cnt()
 
 void thread_action(void * aux)
 {
+    printf("robot thread executed");
     while(1) {
         int idx = *((int *)aux);
         printf("thread %d execute", idx);
@@ -88,6 +96,7 @@ void thread_action(void * aux)
         boxes_from_robots[idx].msg = msg;
 
         block_thread(robots[idx]);
+        sema_up(&cnt_sema);
     }
     
 }
@@ -110,6 +119,7 @@ int to_number(const char *str)
         }
     }
 
+    printf("robot_num: %d\n", atoi(str));
     return atoi(str);
 }
 
@@ -144,6 +154,7 @@ char **split_colon_dynamic(const char *input, int *count)
 //  argv[1]: robot num, argv[2]: item number and destination (ex: 1A:2B:3C:4D)
 void run_automated_warehouse(char **argv)
 {
+    sema_init(&cnt_sema, 0);
     init_automated_warehouse(argv); // do not remove this
 
     printf("implement automated warehouse!\n");
