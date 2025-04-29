@@ -107,7 +107,7 @@ void cnt()
         // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
         if (robot_all_move())
         {
-            timer_sleep(200); // 실행 전 항상 1초 대기
+            timer_sleep(100); // 실행 전 항상 1초 대기
             print_map(robots, robot_num);
 
             // 로봇의 위치들이 어디인지 저장
@@ -127,6 +127,9 @@ void cnt()
              */
             for (int i = 0; i < robot_num; i++)
             {
+                if (robots[i].is_finished)
+                    continue;
+
                 int row = robots[i].row;
                 int col = robots[i].col;
                 for (int j = 0; j < 7; j++)
@@ -166,6 +169,9 @@ void cnt()
                     };
                 boxes_from_central_control_node[i].msg = msg;
                 boxes_from_central_control_node[i].dirtyBit = 1;
+
+                // 로봇 한 개씩만 움직일때 필요
+                break;
             }
 
             if (transport_over())
@@ -199,35 +205,35 @@ void thread_action(void *aux)
             direction = boxes_from_central_control_node[idx].msg.cmd;
             boxes_from_central_control_node[idx].dirtyBit = 0;
             __sync_synchronize();
-        }
 
-        /*
-         * cnt가 알려준 방향으로 이동(by cmd)
-         */
+            /*
+             * cnt가 알려준 방향으로 이동(by cmd)
+             */
 
-        printf("direction; %c\n", direction);
-        int move_row = 0;
-        int move_col = 0;
-        switch (direction)
-        {
-        case 'U':
-            move_row = -1;
-            break;
-        case 'D':
-            move_row = 1;
-            break;
-        case 'L':
-            move_col = -1;
-            break;
-        case 'R':
-            move_col = 1;
-            break;
-        default:
-            break;
+            printf("direction; %c\n", direction);
+            int move_row = 0;
+            int move_col = 0;
+            switch (direction)
+            {
+            case 'U':
+                move_row = -1;
+                break;
+            case 'D':
+                move_row = 1;
+                break;
+            case 'L':
+                move_col = -1;
+                break;
+            case 'R':
+                move_col = 1;
+                break;
+            default:
+                break;
+            }
+            robots[idx].row += move_row;
+            robots[idx].col += move_col;
+            printf("robot pos: %d %d\n", robots[idx].row, robots[idx].col);
         }
-        robots[idx].row += move_row;
-        robots[idx].col += move_col;
-        printf("robot pos: %d %d\n", robots[idx].row, robots[idx].col);
 
         // 위치 메세지 등 robot -> cnt
         struct message msg = {
