@@ -48,7 +48,7 @@ bool robot_all_move()
 }
 
 // 로봇의 위치를 받아서 저장
-int **get_robot_position(int robot_num, int **robot_position)
+int **get_robot_position(int **robot_position)
 {
     // 로봇의 위치를 받아서 저장
     for (int i = 0; i < robot_num; i++)
@@ -60,11 +60,22 @@ int **get_robot_position(int robot_num, int **robot_position)
             continue;
         }
         struct message robot_pos = boxes_from_robots[i].msg;
+        boxes_from_robots[i].dirtyBit = 0;
         robot_position[i][0] = robot_pos.row;
         robot_position[i][1] = robot_pos.col;
     }
 }
 
+// 로봇의 위치를 모두 읽었는지 확인
+bool check_all_read()
+{
+    for (int i = 0; i < robot_num; i++)
+    {
+        if (boxes_from_robots[i].dirtyBit == 1)
+            return false;
+    }
+    return true;
+}
 // central control node thread
 void cnt()
 {
@@ -86,7 +97,10 @@ void cnt()
             print_map(robots, robot_num);
 
             // 로봇의 위치들이 어디인지 저장
-            get_robot_position(robot_num, robot_position);
+            while (check_all_read())
+            {
+                get_robot_position(robot_position);
+            }
 
             /*
              * 로봇의 위치를 통해 움직일 위치 지정
@@ -99,23 +113,34 @@ void cnt()
              */
             for (int i = 0; i < robot_num; i++)
             {
-                int row = robots[i].row;
-                int col = robots[i].col;
-                for (int i = 0; i < 7; i++)
+                int row = robot_position[i][0];
+                int col = robot_position[i][1];
+                for (int j = 0; j < 7; j++)
                 {
-                    if (row == item_positions[i][0] && col == item_positions[i][1])
+                    if (row == item_positions[j][0] && col == item_positions[j][1])
                     {
-                        robots[i].get_item = true;
+                        robots[i].current_payload += 1;
                         printf("robot is in %d %d and get item!", row, col);
+                    }
+                }
+                for (int j = 0; j < 3; j++)
+                {
+                    if (row == finish_positions[j][0] && col == finish_positions[j][1])
+                    {
+                        robots[i].is_finished = true;
+                        printf("robot is in %d %d and finish!", row, col);
                     }
                 }
 
                 char direction;
 
-                if (robots[i].get_item)
+                if (robots[i].current_payload != 0)
                     direction = down_direction_map[robots[i].item_number - 1][alphabet_to_index(robots[i].destination)][robots[i].row][robots[i].col];
                 else
                     direction = up_direction_map[robots[i].item_number - 1][robots[i].row][robots[i].col];
+
+                if (robots[i].is_finished)
+                    direction = 'X';
 
                 struct message msg =
                     {
@@ -123,7 +148,7 @@ void cnt()
                         robots[i].col,
                         robots[i].current_payload,
                         robots[i].required_payload,
-                        direction // cmd -> cnt to robot == 의미 없음.
+                        direction // direction만 의미 O
                     };
                 boxes_from_central_control_node[i].msg = msg;
                 boxes_from_central_control_node[i].dirtyBit = 1;
@@ -291,13 +316,17 @@ void run_automated_warehouse(char **argv)
 
     robots = malloc(sizeof(struct robot) * robot_num);
     printf("Generate robots\n");
+    char **robot_name = malloc(sizeof(char *) * robot_num);
     for (int i = 0; i < robot_num; i++)
     {
-        char robot_name[10];
+        robot_name[i] = malloc(sizeof(char) * 10);
+        snprintf(robot_name[i], sizeof(10), "R%d", i + 1);
+    }
+    for (int i = 0; i < robot_num; i++)
+    {
         int item_number = num_place_pair[i][0] - '0';
         char destination = num_place_pair[i][1];
-        snprintf(robot_name, sizeof(robot_name), "R%d", i + 1);
-        setRobot(&robots[i], robot_name, 5, 5, 1, 0, item_number, destination, false);
+        setRobot(&robots[i], robot_name[i], 5, 5, 1, 0, item_number, destination);
         printf("robot name: %s, item_number: %d, destination: %c\n", robots[i].name, robots[i].item_number, robots[i].destination);
     }
 

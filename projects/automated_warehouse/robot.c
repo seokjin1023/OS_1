@@ -1,9 +1,11 @@
 #include "projects/automated_warehouse/robot.h"
 
+#include <stdio.h>
+
 /**
  * A function setting up robot structure
  */
-void setRobot(struct robot *_robot, const char *name, int row, int col, int required_payload, int current_payload, int item_number, char destination, bool get_item)
+void setRobot(struct robot *_robot, const char *name, int row, int col, int required_payload, int current_payload, int item_number, char destination)
 {
     _robot->name = name;
     _robot->row = row;
@@ -14,5 +16,6 @@ void setRobot(struct robot *_robot, const char *name, int row, int col, int requ
     // add
     _robot->item_number = item_number;
     _robot->destination = destination;
-    _robot->get_item = get_item;
+
+    _robot->is_finished = false;
 }
