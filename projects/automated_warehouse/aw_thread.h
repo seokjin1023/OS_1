@@ -4,6 +4,7 @@
 #include "threads/interrupt.h"
 #include "threads/synch.h"
 #include "threads/thread.h"
+#include "projects/automated_warehouse/robot.h"
 
 extern struct list blocked_threads;
 

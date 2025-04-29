@@ -19,15 +19,12 @@ struct list blocked_threads;
  * It must be called by robot threads
  * Block the current thread and add it to the blocked threads
  */
-void block_thread(struct robot *robot)
+void block_thread()
 {
-    printf("block thread\n");
-    printf("block thread (list_empty: %d)\n", list_empty(&blocked_threads));
-    printf("list_begin: %p, list_end: %p\n", list_begin(&blocked_threads), list_end(&blocked_threads));
+    printf("block %s\n", thread_current()->name);
 
     enum intr_level old_level;
 
-    ASSERT(robot != NULL);
     ASSERT(!intr_context());
 
     old_level = intr_disable();
@@ -44,15 +41,15 @@ void block_thread(struct robot *robot)
 void unblock_threads()
 {
     printf("unblock threads\n");
-    printf("block thread (list_empty: %d)\n", list_empty(&blocked_threads));
-    printf("list_begin: %p, list_end: %p\n", list_begin(&blocked_threads), list_end(&blocked_threads));
-
     struct list_elem *e;
 
-    for (e = list_begin(&blocked_threads); e != list_end(&blocked_threads); e = list_next(e))
+    e = list_begin(&blocked_threads);
+    while (e != list_end(&blocked_threads))
     {
+        struct list_elem *next = list_next(e);
         struct thread *t = list_entry(e, struct thread, elem);
         thread_unblock(t);
+        e = next;
     }
     // 모든 thread unblock 이후 list 초기화
     list_init(&blocked_threads);

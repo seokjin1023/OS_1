@@ -23,7 +23,7 @@ struct message
     // To robots
     //
     /** next command for robot */
-    int cmd;
+    char cmd;
 };
 
 /**

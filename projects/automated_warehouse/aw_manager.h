@@ -25,9 +25,9 @@ extern unsigned int step;
 extern const char thread_status[4][10];
 extern const char map_draw_default[MAP_HEIGHT][MAP_WIDTH];
 
-void init_automated_warehouse(char** argv);
+void init_automated_warehouse(char **argv);
 
-void print_map(struct robot* __robots, int __number_of_robots);
+void print_map(struct robot *__robots, int __number_of_robots);
 
 void increase_step();
 
