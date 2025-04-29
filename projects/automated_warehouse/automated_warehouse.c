@@ -41,7 +41,6 @@ bool robot_all_move()
         // dirtyBit == 1이라는게 읽지 않았다는 의미
         if (boxes_from_central_control_node[i].dirtyBit == 1)
         {
-            printf("%d not checked yet\n", i + 1);
             return false;
         }
     }
@@ -83,11 +82,24 @@ bool transport_over()
 {
     for (int i = 0; i < robot_num; i++)
     {
-        printf("robot %d is checked\n", i + 1);
         if (robots[i].is_finished == false)
             return false;
     }
     return true;
+}
+
+void check_moving_item(bool *moving_item)
+{
+    printf("moving item check start\n");
+    for (int i = 0; i < robot_num; i++)
+    {
+        if (robots[i].is_finished)
+            continue;
+        if (robots[i].row == 5 && robots[i].col == 5)
+            continue;
+
+        moving_item[robots[i].item_number - 1] = true;
+    }
 }
 
 // central control node thread
@@ -99,6 +111,10 @@ void cnt()
     for (int i = 0; i < robot_num; i++)
         robot_position[i] = malloc(sizeof(int) * 2);
 
+    bool moving_item[7];
+    for (int i = 0; i < 7; i++)
+        moving_item[i] = false;
+
     while (1)
     {
         // semaphore로 대기했다가 로봇이 데이터를 보낼 때마다 확인
@@ -107,7 +123,7 @@ void cnt()
         // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
         if (robot_all_move())
         {
-            timer_sleep(100); // 실행 전 항상 1초 대기
+            timer_sleep(200); // 실행 전 항상 1초 대기
             print_map(robots, robot_num);
 
             // 로봇의 위치들이 어디인지 저장
@@ -115,6 +131,9 @@ void cnt()
             {
                 get_robot_position(robot_position);
             }
+
+            // 현재 로봇들이 어떤 물건을 배송해야하는지 확인
+            check_moving_item(moving_item);
 
             /*
              * 로봇의 위치를 통해 움직일 위치 지정
@@ -136,7 +155,7 @@ void cnt()
                 {
                     if (row == item_positions[j][0] && col == item_positions[j][1])
                     {
-                        robots[i].current_payload += 1;
+                        robots[i].current_payload = 1;
                         printf("robot is in %d %d and get item!", row, col);
                     }
                 }
@@ -147,6 +166,15 @@ void cnt()
                         robots[i].is_finished = true;
                         printf("robot is in %d %d and finish!", row, col);
                     }
+                }
+
+                // 시작 지점의 robot 중 해당 item을 움직이는 로봇이 있으면 X
+                if (row == 5 && col == 5)
+                {
+                    if (moving_item[robots[i].item_number - 1])
+                        continue;
+                    else
+                        moving_item[robots[i].item_number - 1] = true;
                 }
 
                 char direction;
@@ -169,10 +197,10 @@ void cnt()
                     };
                 boxes_from_central_control_node[i].msg = msg;
                 boxes_from_central_control_node[i].dirtyBit = 1;
-
-                // 로봇 한 개씩만 움직일때 필요
-                break;
             }
+
+            for (int i = 0; i < 7; i++)
+                moving_item[i] = false;
 
             if (transport_over())
             {
@@ -192,12 +220,49 @@ void cnt()
     free(robot_position);
 }
 
+// 로봇이 이동할 위치에 있는지 확인
+bool can_move(int idx, int row, int col)
+{
+    // 특수한 경우(2,3)으로 갈 때 (3,3)에 있는게 있으면 가면 안됨. 반대도 마찬가지
+    if (row == 2 && col == 2)
+    {
+        for (int i = 0; i < robot_num; i++)
+        {
+            if (i == idx)
+                continue;
+            if (robots[i].row == 3 && robots[i].col == 2)
+                return false;
+        }
+    }
+    if (row == 3 && col == 2)
+    {
+        for (int i = 0; i < robot_num; i++)
+        {
+            if (i == idx)
+                continue;
+            if (robots[i].row == 2 && robots[i].col == 2)
+                return false;
+        }
+    }
+    // 이동할 위치에 로봇이 존재하는지 확인
+    for (int i = 0; i < robot_num; i++)
+    {
+        if (robots[i].row == row && robots[i].col == col)
+        {
+            if ((row == 0 && col == 2) || (row == 2 && col == 0) || (row == 5 && col == 2))
+                continue;
+            else
+                return false;
+        }
+    }
+    return true;
+}
+// 실제 로봇 이동
 void thread_action(void *aux)
 {
     while (1)
     {
         int idx = *((int *)aux);
-        printf("thread %d execute\n", idx);
 
         char direction = 0;
         if (boxes_from_central_control_node[idx].dirtyBit != 0)
@@ -209,8 +274,6 @@ void thread_action(void *aux)
             /*
              * cnt가 알려준 방향으로 이동(by cmd)
              */
-
-            printf("direction; %c\n", direction);
             int move_row = 0;
             int move_col = 0;
             switch (direction)
@@ -230,9 +293,15 @@ void thread_action(void *aux)
             default:
                 break;
             }
-            robots[idx].row += move_row;
-            robots[idx].col += move_col;
-            printf("robot pos: %d %d\n", robots[idx].row, robots[idx].col);
+
+            // 만약 이동할 위치에 로봇이 있다면 '대기'
+            if (can_move(idx, robots[idx].row + move_row, robots[idx].col + move_col))
+            {
+                robots[idx].row += move_row;
+                robots[idx].col += move_col;
+            }
+            else
+                printf("robot %d can't move\n", idx + 1);
         }
 
         // 위치 메세지 등 robot -> cnt
