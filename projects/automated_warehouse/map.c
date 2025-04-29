@@ -280,26 +280,31 @@ char dir_6[6][7] = {
     "XXXXXUX",
 };
 
+int i_p[7][2] = {
+    {1, 1}, // 1
+    {1, 3}, // 2
+    {1, 4}, // 3
+    {1, 5}, // 4
+    {4, 1}, // 5
+    {4, 3}, // 6
+    {4, 4}  // 7
+};
+
+int f_p[3][2] = {
+    {0, 2}, // A
+    {2, 0}, // B
+    {5, 2}  // C
+};
+
 char down_direction_map[7][3][6][7];
 char up_direction_map[7][6][7];
+int item_position[7][2];
+int finish_position[3][2];
 
 void init_direction_map()
 {
-  int item_position[7][2] = {
-      {1, 1}, // 1
-      {1, 3}, // 2
-      {1, 4}, // 3
-      {1, 5}, // 4
-      {4, 1}, // 5
-      {4, 3}, // 6
-      {4, 4}  // 7
-  };
-
-  int finish_position[3][2] = {
-      {0, 2}, // A
-      {2, 0}, // B
-      {5, 2}  // C
-  };
+  memcpy(item_positions, i_p, sizeof(i_p));
+  memcpy(finish_positions, f_p, sizeof(f_p));
 
   memcpy(down_direction_map[0][0], dir_0_0, sizeof(dir_0_0));
   memcpy(down_direction_map[0][1], dir_0_1, sizeof(dir_0_1));

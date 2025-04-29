@@ -8,6 +8,7 @@
 #include "threads/thread.h"
 
 #include "devices/timer.h"
+#include "devices/shutdown.h"
 
 #include "projects/automated_warehouse/aw_manager.h"
 #include "projects/automated_warehouse/aw_message.h"
@@ -76,6 +77,19 @@ bool check_all_read()
     }
     return true;
 }
+
+// 모든 로봇의 운송이 끝났다면 true 반환
+bool transport_over()
+{
+    for (int i = 0; i < robot_num; i++)
+    {
+        printf("robot %d is checked\n", i + 1);
+        if (robots[i].is_finished == false)
+            return false;
+    }
+    return true;
+}
+
 // central control node thread
 void cnt()
 {
@@ -113,8 +127,8 @@ void cnt()
              */
             for (int i = 0; i < robot_num; i++)
             {
-                int row = robot_position[i][0];
-                int col = robot_position[i][1];
+                int row = robots[i].row;
+                int col = robots[i].col;
                 for (int j = 0; j < 7; j++)
                 {
                     if (row == item_positions[j][0] && col == item_positions[j][1])
@@ -152,6 +166,12 @@ void cnt()
                     };
                 boxes_from_central_control_node[i].msg = msg;
                 boxes_from_central_control_node[i].dirtyBit = 1;
+            }
+
+            if (transport_over())
+            {
+                printf("is over\n");
+                shutdown_power_off();
             }
 
             unblock_threads();
@@ -282,16 +302,6 @@ void run_automated_warehouse(char **argv)
     sema_init(&cnt_sema, 0);
     init_automated_warehouse(argv); // do not remove this
     init_direction_map();
-
-    printf("Check init direction map\n");
-    for (int i = 0; i < 6; i++)
-    {
-        for (int j = 0; j < 7; j++)
-        {
-            printf("%c", down_direction_map[0][0][i][j]);
-        }
-        printf("\n");
-    }
 
     printf("implement automated warehouse!\n");
 
