@@ -66,17 +66,6 @@ int **get_robot_position(int **robot_position)
     }
 }
 
-// 로봇의 위치를 모두 읽었는지 확인
-bool check_all_read()
-{
-    for (int i = 0; i < robot_num; i++)
-    {
-        if (boxes_from_robots[i].dirtyBit == 1)
-            return false;
-    }
-    return true;
-}
-
 // 모든 로봇의 운송이 끝났다면 true 반환
 bool transport_over()
 {
@@ -127,10 +116,7 @@ void cnt()
             print_map(robots, robot_num);
 
             // 로봇의 위치들이 어디인지 저장
-            while (check_all_read())
-            {
-                get_robot_position(robot_position);
-            }
+            get_robot_position(robot_position);
 
             // 현재 로봇들이 어떤 물건을 배송해야하는지 확인
             check_moving_item(moving_item);
@@ -433,12 +419,10 @@ void run_automated_warehouse(char **argv)
     // 직접 로봇을 움직일 thread들
     for (int i = 0; i < robot_num; i++)
     {
-        char robot_name[10];
-        snprintf(robot_name, sizeof(robot_name), "R%d", i);
         int *arg = malloc(sizeof(int));
         *arg = i;
 
-        threads[i + 1] = thread_create(robot_name, 0, &thread_action, arg);
+        threads[i + 1] = thread_create(robot_name[i], 0, &thread_action, arg);
         printf("create robot thread %d\n", i);
     }
 }
