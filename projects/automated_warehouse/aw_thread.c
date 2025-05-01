@@ -21,8 +21,6 @@ struct list blocked_threads;
  */
 void block_thread()
 {
-    printf("block %s\n", thread_current()->name);
-
     enum intr_level old_level;
 
     ASSERT(!intr_context());
@@ -40,7 +38,6 @@ void block_thread()
  */
 void unblock_threads()
 {
-    printf("unblock threads\n");
     struct list_elem *e;
 
     e = list_begin(&blocked_threads);

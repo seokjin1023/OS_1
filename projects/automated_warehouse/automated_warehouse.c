@@ -112,13 +112,20 @@ void cnt()
         // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
         if (robot_all_move())
         {
-            timer_sleep(200); // 실행 전 항상 1초 대기
+            timer_sleep(10); // 실행 전 항상 1초 대기
             print_map(robots, robot_num);
+
+            // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
+            if (transport_over())
+            {
+                printf("is over\n");
+                shutdown_power_off();
+            }
 
             // 로봇의 위치들이 어디인지 저장
             get_robot_position(robot_position);
 
-            // 현재 로봇들이 어떤 물건을 배송해야하는지 확인
+            // 현재 로봇들이 어떤 물건을 배송하고 있는지 확인
             check_moving_item(moving_item);
 
             /*
@@ -170,9 +177,6 @@ void cnt()
                 else
                     direction = up_direction_map[robots[i].item_number - 1][robots[i].row][robots[i].col];
 
-                if (robots[i].is_finished)
-                    direction = 'X';
-
                 struct message msg =
                     {
                         robots[i].row,
@@ -187,12 +191,6 @@ void cnt()
 
             for (int i = 0; i < 7; i++)
                 moving_item[i] = false;
-
-            if (transport_over())
-            {
-                printf("is over\n");
-                shutdown_power_off();
-            }
 
             unblock_threads();
             increase_step();
