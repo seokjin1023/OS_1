@@ -79,7 +79,6 @@ bool transport_over()
 
 void check_moving_item(bool *moving_item)
 {
-    printf("moving item check start\n");
     for (int i = 0; i < robot_num; i++)
     {
         if (robots[i].is_finished)
@@ -112,7 +111,7 @@ void cnt()
         // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
         if (robot_all_move())
         {
-            timer_sleep(10); // 실행 전 항상 1초 대기
+            timer_sleep(100); // 실행 전 항상 1초 대기
             print_map(robots, robot_num);
 
             // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
@@ -149,7 +148,6 @@ void cnt()
                     if (row == item_positions[j][0] && col == item_positions[j][1])
                     {
                         robots[i].current_payload = 1;
-                        printf("robot is in %d %d and get item!", row, col);
                     }
                 }
                 for (int j = 0; j < 3; j++)
@@ -157,7 +155,6 @@ void cnt()
                     if (row == finish_positions[j][0] && col == finish_positions[j][1])
                     {
                         robots[i].is_finished = true;
-                        printf("robot is in %d %d and finish!", row, col);
                     }
                 }
 
