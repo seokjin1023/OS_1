@@ -205,23 +205,23 @@ void cnt()
 bool can_move(int idx, int row, int col)
 {
     // 특수한 경우(2,3)으로 갈 때 (3,3)에 있는게 있으면 가면 안됨. 반대도 마찬가지
-    if (row == 2 && col == 2)
+    if (col == 1)
     {
         for (int i = 0; i < robot_num; i++)
         {
             if (i == idx)
                 continue;
-            if (robots[i].row == 3 && robots[i].col == 2)
+            if (robots[i].col == 1)
                 return false;
         }
     }
-    if (row == 3 && col == 2)
+    if (col == 5)
     {
         for (int i = 0; i < robot_num; i++)
         {
             if (i == idx)
                 continue;
-            if (robots[i].row == 2 && robots[i].col == 2)
+            if (robots[i].col == 5 && robots[i].row != ROW_W) 
                 return false;
         }
     }
@@ -230,7 +230,7 @@ bool can_move(int idx, int row, int col)
     {
         if (robots[i].row == row && robots[i].col == col)
         {
-            if ((row == 0 && col == 2) || (row == 2 && col == 0) || (row == 5 && col == 2))
+            if ((row == ROW_A && col == COL_A) || (row == ROW_B && col == COL_B) || (row == ROW_C && col == COL_C))
                 continue;
             else
                 return false;
@@ -251,6 +251,8 @@ void thread_action(void *aux)
             direction = boxes_from_central_control_node[idx].msg.cmd;
             boxes_from_central_control_node[idx].dirtyBit = 0;
             __sync_synchronize();
+
+            printf("%d robot은 %c로 이동하라고 명령받음.\n", idx + 1, direction);
 
             /*
              * cnt가 알려준 방향으로 이동(by cmd)
@@ -281,8 +283,6 @@ void thread_action(void *aux)
                 robots[idx].row += move_row;
                 robots[idx].col += move_col;
             }
-            else
-                printf("robot %d can't move\n", idx + 1);
         }
 
         // 위치 메세지 등 robot -> cnt
@@ -392,7 +392,7 @@ void run_automated_warehouse(char **argv)
     {
         int item_number = num_place_pair[i][0] - '0';
         char destination = num_place_pair[i][1];
-        setRobot(&robots[i], robot_name[i], 5, 5, 1, 0, item_number, destination);
+        setRobot(&robots[i], robot_name[i], ROW_W, COL_W, 1, 0, item_number, destination);
         printf("robot name: %s, item_number: %d, destination: %c\n", robots[i].name, robots[i].item_number, robots[i].destination);
     }
 

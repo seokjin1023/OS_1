@@ -9,22 +9,24 @@ const char thread_status[4][10] = {
     "RUNNING",
     "READY",
     "BLOCKED",
-    "DYING"};
+    "DYING"
+};
 
 const char map_draw_default[MAP_HEIGHT][MAP_WIDTH] = {
-    {'X', 'X', 'A', 'X', 'X', 'X', 'X'},
-    {'X', '1', ' ', '2', '3', '4', 'X'},
-    {'B', ' ', ' ', ' ', ' ', ' ', 'X'},
-    {'X', ' ', ' ', ' ', ' ', ' ', 'X'},
-    {'X', '5', ' ', '6', '7', 'S', 'X'},
-    {'X', 'X', 'C', 'X', 'X', 'W', 'X'}};
+    {'X', 'X', 'X', 'X', 'X', 'X', 'X' },
+    {'A', ' ', ' ', '7', ' ', ' ', 'X' },
+    {'X', ' ', '1', 'X', '4', ' ', 'X' },
+    {'B', ' ', '2', 'X', '5', ' ', 'X' },
+    {'X', ' ', '3', 'X', '6', ' ', 'X' },
+    {'C', ' ', ' ', ' ', ' ', 'S', 'X' },
+    {'X', 'X', 'X', 'X', 'X', 'W', 'X' }
+};
 
 /**
  * Before starting the simulator, initialize essential component
  * It must be called top of the main code
  */
-void init_automated_warehouse(char **__argv)
-{
+void init_automated_warehouse(char** __argv){
     printf("arguments list:%s, %s, %s\n", __argv[0], __argv[1], __argv[2]);
     list_init(&blocked_threads);
 }
@@ -32,13 +34,10 @@ void init_automated_warehouse(char **__argv)
 /**
  * Private code for printing
  */
-void _print_place(struct robot *__robots, int __number_of_robots, int __row, int __col)
-{
-    for (int robotIdx = 0; robotIdx < __number_of_robots; robotIdx++)
-    {
-        struct robot *__robot = &__robots[robotIdx];
-        if (__robot->row == __row && __robot->col == __col)
-            printf("%sM%d,", __robot->name, __robot->current_payload);
+void _print_place(struct robot* __robots, int __number_of_robots, int __row, int __col){
+    for (int robotIdx = 0; robotIdx < __number_of_robots; robotIdx++){
+        struct robot* __robot = &__robots[robotIdx];
+        if (__robot->row == __row && __robot->col == __col) printf("%sM%d,",__robot->name, __robot->current_payload);
     }
 }
 /**
@@ -46,38 +45,28 @@ void _print_place(struct robot *__robots, int __number_of_robots, int __row, int
  * It requires array of robots and length of array
  * It must be called before unblocking robot threads
  */
-void print_map(struct robot *__robots, int __number_of_robots)
-{
+void print_map(struct robot* __robots, int __number_of_robots){    
     printf("STEP_INFO_START::%d\n", step);
     printf("MAP_INFO::\n");
-    for (int row = 0; row < MAP_HEIGHT; row++)
-    {
-        for (int col = 0; col < MAP_WIDTH; col++)
-        {
+    for (int row = 0; row < MAP_HEIGHT; row++){
+        for (int col = 0; col < MAP_WIDTH; col++){
             if (map_draw_default[row][col] == 'A' ||
                 map_draw_default[row][col] == 'B' ||
                 map_draw_default[row][col] == 'C' ||
-                map_draw_default[row][col] == 'W')
-            {
+                map_draw_default[row][col] == 'W'){
                 printf("%c    ", map_draw_default[row][col]);
             }
-            else
-            {
+            else {
                 int isFound = 0;
-                for (int robotIdx = 0; robotIdx < __number_of_robots; robotIdx++)
-                {
-                    struct robot *__robot = &__robots[robotIdx];
-                    if (__robot->col == col && __robot->row == row)
-                    {
-                        if (__robot->current_payload > 0)
-                            printf("%sM%d ", __robot->name, __robot->current_payload);
-                        else
-                            printf("%s   ", __robot->name);
+                for (int robotIdx = 0; robotIdx < __number_of_robots; robotIdx++){
+                    struct robot* __robot = &__robots[robotIdx];
+                    if (__robot->col == col && __robot->row == row){
+                        if (__robot->current_payload > 0) printf("%sM%d ", __robot->name, __robot->current_payload);
+                        else printf("%s   ", __robot->name);
                         isFound = 1;
                     }
                 }
-                if (!isFound)
-                    printf("%c    ", map_draw_default[row][col]);
+                if (!isFound) printf("%c    ", map_draw_default[row][col]);
             }
         }
         printf("\n");
@@ -107,7 +96,6 @@ void print_map(struct robot *__robots, int __number_of_robots)
  * A function increasing 1 step
  * It must be called before unblocking and after print_map
  */
-void increase_step()
-{
+void increase_step(){
     step++;
 }

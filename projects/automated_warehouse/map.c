@@ -6,9 +6,10 @@ int alphabet_to_index(char alpha)
 }
 
 // down_direction_map[0][0]
-char dir_0_0[6][7] = {
-    "XX0XXXX",
-    "XRUXXXX",
+char dir_0_0[7][7] = {
+    "XXXXXXX",
+    "0LXXXXX",
+    "XULXXXX",
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
@@ -16,9 +17,10 @@ char dir_0_0[6][7] = {
 };
 
 // down_direction_map[0][1]
-char dir_0_1[6][7] = {
+char dir_0_1[7][7] = {
     "XXXXXXX",
-    "XDXXXXX",
+    "XXXXXXX",
+    "XDLXXXX",
     "0LXXXXX",
     "XXXXXXX",
     "XXXXXXX",
@@ -26,278 +28,304 @@ char dir_0_1[6][7] = {
 };
 
 // down_direction_map[0][2]
-char dir_0_2[6][7] = {
+char dir_0_2[7][7] = {
     "XXXXXXX",
+    "XXXXXXX",
+    "XDLXXXX",
     "XDXXXXX",
-    "XRDXXXX",
-    "XXDXXXX",
-    "XXDXXXX",
-    "XX0XXXX",
+    "XDXXXXX",
+    "0LXXXXX",
+    "XXXXXXX",
 };
 
 // down_direction_map[1][0]
-char dir_1_0[6][7] = {
-    "XX0XXXX",
-    "XXULXXX",
+char dir_1_0[7][7] = {
     "XXXXXXX",
+    "0LXXXXX",
+    "XUXXXXX",
+    "XULXXXX",
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
 };
 
 // down_direction_map[1][1]
-char dir_1_1[6][7] = {
+char dir_1_1[7][7] = {
     "XXXXXXX",
-    "XXXDXXX",
-    "0LLLXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "0LLXXXX",
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
 };
 
 // down_direction_map[1][2]
-char dir_1_2[6][7] = {
+char dir_1_2[7][7] = {
     "XXXXXXX",
-    "XXXDXXX",
-    "XXDLXXX",
-    "XXDXXXX",
-    "XXDXXXX",
-    "XX0XXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XDLXXXX",
+    "XDXXXXX",
+    "0LXXXXX",
+    "XXXXXXX",
 };
 
 // down_direction_map[2][0]
-char dir_2_0[6][7] = {
-    "XX0XXXX",
-    "XXUXDXX",
-    "XXULLXX",
+char dir_2_0[7][7] = {
     "XXXXXXX",
+    "0LXXXXX",
+    "XUXXXXX",
+    "XUXXXXX",
+    "XULXXXX",
     "XXXXXXX",
     "XXXXXXX",
 };
 
 // down_direction_map[2][1]
-char dir_2_1[6][7] = {
+char dir_2_1[7][7] = {
     "XXXXXXX",
-    "XXXXDXX",
-    "0LLLLXX",
     "XXXXXXX",
+    "XXXXXXX",
+    "0LXXXXX",
+    "XULXXXX",
     "XXXXXXX",
     "XXXXXXX",
 };
 
 // down_direction_map[2][2]
-char dir_2_2[6][7] = {
+char dir_2_2[7][7] = {
     "XXXXXXX",
-    "XXXXDXX",
-    "XXDLLXX",
-    "XXDXXXX",
-    "XXDXXXX",
-    "XX0XXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XDLXXXX",
+    "0LXXXXX",
+    "XXXXXXX",
 };
 
 // down_direction_map[3][0]
-char dir_3_0[6][7] = {
-    "XX0XXXX",
-    "XXUXXDX",
-    "XXULLLX",
+char dir_3_0[7][7] = {
     "XXXXXXX",
-    "XXXXXXX",
+    "0LXXXXX",
+    "XUXXRDX",
+    "XUXXXDX",
+    "XUXXXDX",
+    "XULLLLX",
     "XXXXXXX",
 };
 
 // down_direction_map[3][1]
-char dir_3_1[6][7] = {
-    "XXXXXXX",
-    "XXXXXDX",
-    "0LLLLLX",
+char dir_3_1[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
+    "XXXXRDX",
+    "0LXXXDX",
+    "XUXXXDX",
+    "XULLLLX",
     "XXXXXXX",
 };
 
 // down_direction_map[3][2]
-char dir_3_2[6][7] = {
+char dir_3_2[7][7] = {
     "XXXXXXX",
+    "XXXXXXX",
+    "XXXXRDX",
     "XXXXXDX",
-    "XXDLLLX",
-    "XXDXXXX",
-    "XXDXXXX",
-    "XX0XXXX",
+    "XXXXXDX",
+    "0LLLLLX",
+    "XXXXXXX",
 };
 
 // down_direction_map[4][0]
-char dir_4_0[6][7] = {
-    "XX0XXXX",
-    "XXUXXXX",
-    "XXUXXXX",
-    "XRUXXXX",
+char dir_4_0[7][7] = {
+    "XXXXXXX",
+    "0LXXXXX",
     "XUXXXXX",
+    "XUXXRDX",
+    "XUXXXDX",
+    "XULLLLX",
     "XXXXXXX",
 };
 
 // down_direction_map[4][1]
-char dir_4_1[6][7] = {
+char dir_4_1[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
-    "0LXXXXX",
-    "XUXXXXX",
-    "XUXXXXX",
+    "XXXXXXX",
+    "0LXXRDX",
+    "XUXXXDX",
+    "XULLLLX",
     "XXXXXXX",
 };
 
 // down_direction_map[4][2]
-char dir_4_2[6][7] = {
+char dir_4_2[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
+    "XXXXRDX",
+    "XXXXXDX",
+    "0LLLLLX",
     "XXXXXXX",
-    "XRDXXXX",
-    "XX0XXXX",
 };
 
 // down_direction_map[5][0]
-char dir_5_0[6][7] = {
-    "XX0XXXX",
-    "XXUXXXX",
-    "XXUXXXX",
-    "XXULXXX",
-    "XXXUXXX",
+char dir_5_0[7][7] = {
+    "XXXXXXX",
+    "0LXXXXX",
+    "XUXXXXX",
+    "XUXXXXX",
+    "XUXXDXX",
+    "XULLLXX",
     "XXXXXXX",
 };
 
 // down_direction_map[5][1]
-char dir_5_1[6][7] = {
+char dir_5_1[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
-    "0LLXXXX",
-    "XXULXXX",
-    "XXXUXXX",
+    "XXXXXXX",
+    "0LXXXXX",
+    "XUXXDXX",
+    "XULLLXX",
     "XXXXXXX",
 };
 
 // down_direction_map[5][2]
-char dir_5_2[6][7] = {
+char dir_5_2[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
-    "XXDLXXX",
-    "XX0XXXX",
+    "XXXXDXX",
+    "0LLLLXX",
+    "XXXXXXX",
 };
 
 // down_direction_map[6][0]
-char dir_6_0[6][7] = {
-    "XX0XXXX",
-    "XXUXXXX",
-    "XXUXXXX",
-    "XXULLXX",
-    "XXXXUXX",
+char dir_6_0[7][7] = {
+    "XXXXXXX",
+    "0LLLXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
     "XXXXXXX",
 };
 
 // down_direction_map[6][1]
-char dir_6_1[6][7] = {
+char dir_6_1[7][7] = {
+    "XXXXXXX",
+    "XDLLXXX",
+    "XDXXXXX",
+    "0LXXXXX",
     "XXXXXXX",
     "XXXXXXX",
-    "0LLXXXX",
-    "XXULLXX",
-    "XXXXUXX",
     "XXXXXXX",
 };
 
 // down_direction_map[6][2]
-char dir_6_2[6][7] = {
+char dir_6_2[7][7] = {
     "XXXXXXX",
+    "XDLLXXX",
+    "XDXXXXX",
+    "XDXXXXX",
+    "XDXXXXX",
+    "0LXXXXX",
     "XXXXXXX",
-    "XXXXXXX",
-    "XXDLLXX",
-    "XXDXUXX",
-    "XX0XXXX",
 };
 
 // up_direction_map[0]
-char dir_0[6][7] = {
+char dir_0[7][7] = {
     "XXXXXXX",
-    "X0XXXXX",
-    "XULXXXX",
-    "XXULLLX",
-    "XXXXXUX",
+    "XXXXXXX",
+    "XR0XXXX",
+    "XUXXXXX",
+    "XUXXXXX",
+    "XULLLLX",
     "XXXXXUX",
 };
 
 // up_direction_map[1]
-char dir_1[6][7] = {
+char dir_1[7][7] = {
     "XXXXXXX",
-    "XXX0XXX",
-    "XXXULLX",
-    "XXXXXUX",
-    "XXXXXUX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XR0XXXX",
+    "XUXXXXX",
+    "XULLLLX",
     "XXXXXUX",
 };
 // up_direction_map[2]
-char dir_2[6][7] = {
+char dir_2[7][7] = {
     "XXXXXXX",
-    "XXXX0XX",
-    "XXXXULX",
-    "XXXXXUX",
-    "XXXXXUX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XX0XXXX",
+    "XXULLLX",
     "XXXXXUX",
 };
 // up_direction_map[3]
-char dir_3[6][7] = {
+char dir_3[7][7] = {
     "XXXXXXX",
-    "XXXXX0X",
+    "XXXXXXX",
+    "XXXX0LX",
     "XXXXXUX",
     "XXXXXUX",
     "XXXXXUX",
     "XXXXXUX",
 };
 // up_direction_map[4]
-char dir_4[6][7] = {
-    "XXXXXXX",
-    "XXXXXXX",
-    "XXXXXXX",
-    "XDLLLLX",
-    "X0XXXUX",
-    "XXXXXUX",
-};
-// up_direction_map[5]
-char dir_5[6][7] = {
-    "XXXXXXX",
-    "XXXXXXX",
-    "XXXXXXX",
-    "XXXDLLX",
-    "XXX0XUX",
-    "XXXXXUX",
-};
-// up_direction_map[6]
-char dir_6[6][7] = {
-    "XXXXXXX",
+char dir_4[7][7] = {
     "XXXXXXX",
     "XXXXXXX",
     "XXXXXXX",
     "XXXX0LX",
     "XXXXXUX",
+    "XXXXXUX",
+    "XXXXXUX",
+};
+// up_direction_map[5]
+char dir_5[7][7] = {
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXXXXX",
+    "XXXX0XX",
+    "XXXXULX",
+    "XXXXXUX",
+};
+// up_direction_map[6]
+char dir_6[7][7] = {
+    "XXXXXXX",
+    "XXX0LLX",
+    "XXXXXUX",
+    "XXXXXUX",
+    "XXXXXUX",
+    "XXXXXUX",
+    "XXXXXUX",
 };
 
 int i_p[7][2] = {
-    {1, 1}, // 1
-    {1, 3}, // 2
-    {1, 4}, // 3
-    {1, 5}, // 4
-    {4, 1}, // 5
-    {4, 3}, // 6
-    {4, 4}  // 7
+    {2, 2}, // 1
+    {3, 2}, // 2
+    {4, 2}, // 3
+    {2, 4}, // 4
+    {3, 4}, // 5
+    {4, 4}, // 6
+    {1, 3}  // 7
 };
 
 int f_p[3][2] = {
-    {0, 2}, // A
-    {2, 0}, // B
-    {5, 2}  // C
+    {1, 0}, // A
+    {3, 0}, // B
+    {5, 0}  // C
 };
 
-char down_direction_map[7][3][6][7];
-char up_direction_map[7][6][7];
+char down_direction_map[7][3][7][7];
+char up_direction_map[7][7][7];
 int item_position[7][2];
 int finish_position[3][2];
 
