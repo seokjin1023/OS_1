@@ -112,7 +112,6 @@ void cnt()
         if (robot_all_move())
         {
             timer_sleep(100); // 실행 전 항상 1초 대기
-            print_map(robots, robot_num);
 
             // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
             if (transport_over())
@@ -123,6 +122,9 @@ void cnt()
 
             // 로봇의 위치들이 어디인지 저장
             get_robot_position(robot_position);
+
+            // 로봇의 위치 모두 확인 후 print_map 호출
+            print_map(robots, robot_num);
 
             // 현재 로봇들이 어떤 물건을 배송하고 있는지 확인
             check_moving_item(moving_item);
