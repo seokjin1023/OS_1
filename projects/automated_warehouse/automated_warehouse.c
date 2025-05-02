@@ -138,9 +138,6 @@ void cnt()
              */
             for (int i = 0; i < robot_num; i++)
             {
-                if (robots[i].is_finished)
-                    continue;
-
                 int row = robots[i].row;
                 int col = robots[i].col;
                 for (int j = 0; j < 7; j++)
@@ -173,6 +170,9 @@ void cnt()
                     direction = down_direction_map[robots[i].item_number - 1][alphabet_to_index(robots[i].destination)][robots[i].row][robots[i].col];
                 else
                     direction = up_direction_map[robots[i].item_number - 1][robots[i].row][robots[i].col];
+
+                if (robots[i].is_finished)
+                    direction = 'X';
 
                 struct message msg =
                     {
@@ -221,7 +221,7 @@ bool can_move(int idx, int row, int col)
         {
             if (i == idx)
                 continue;
-            if (robots[i].col == 5 && robots[i].row != ROW_W) 
+            if (robots[i].col == 5 && robots[i].row != ROW_W)
                 return false;
         }
     }
@@ -246,41 +246,38 @@ void thread_action(void *aux)
         int idx = *((int *)aux);
 
         char direction = 0;
-        if (boxes_from_central_control_node[idx].dirtyBit != 0)
+        direction = boxes_from_central_control_node[idx].msg.cmd;
+        boxes_from_central_control_node[idx].dirtyBit = 0;
+        __sync_synchronize();
+
+        /*
+         * cnt가 알려준 방향으로 이동(by cmd)
+         */
+        int move_row = 0;
+        int move_col = 0;
+        switch (direction)
         {
-            direction = boxes_from_central_control_node[idx].msg.cmd;
-            boxes_from_central_control_node[idx].dirtyBit = 0;
-            __sync_synchronize();
+        case 'U':
+            move_row = -1;
+            break;
+        case 'D':
+            move_row = 1;
+            break;
+        case 'L':
+            move_col = -1;
+            break;
+        case 'R':
+            move_col = 1;
+            break;
+        default:
+            break;
+        }
 
-            /*
-             * cnt가 알려준 방향으로 이동(by cmd)
-             */
-            int move_row = 0;
-            int move_col = 0;
-            switch (direction)
-            {
-            case 'U':
-                move_row = -1;
-                break;
-            case 'D':
-                move_row = 1;
-                break;
-            case 'L':
-                move_col = -1;
-                break;
-            case 'R':
-                move_col = 1;
-                break;
-            default:
-                break;
-            }
-
-            // 만약 이동할 위치에 로봇이 있다면 '대기'
-            if (can_move(idx, robots[idx].row + move_row, robots[idx].col + move_col))
-            {
-                robots[idx].row += move_row;
-                robots[idx].col += move_col;
-            }
+        // 만약 이동할 위치에 로봇이 있다면 '대기'
+        if (can_move(idx, robots[idx].row + move_row, robots[idx].col + move_col))
+        {
+            robots[idx].row += move_row;
+            robots[idx].col += move_col;
         }
 
         // 위치 메세지 등 robot -> cnt
@@ -318,7 +315,6 @@ int to_number(const char *str)
         }
     }
 
-    printf("robot_num: %d\n", atoi(str));
     return atoi(str);
 }
 
@@ -357,8 +353,6 @@ void run_automated_warehouse(char **argv)
     init_automated_warehouse(argv); // do not remove this
     init_direction_map();
 
-    printf("implement automated warehouse!\n");
-
     robot_num = to_number(argv[1]);
     int pair_num = 0;
 
@@ -379,7 +373,6 @@ void run_automated_warehouse(char **argv)
     }
 
     robots = malloc(sizeof(struct robot) * robot_num);
-    printf("Generate robots\n");
     char **robot_name = malloc(sizeof(char *) * robot_num);
     for (int i = 0; i < robot_num; i++)
     {
@@ -391,7 +384,6 @@ void run_automated_warehouse(char **argv)
         int item_number = num_place_pair[i][0] - '0';
         char destination = num_place_pair[i][1];
         setRobot(&robots[i], robot_name[i], ROW_W, COL_W, 1, 0, item_number, destination);
-        printf("robot name: %s, item_number: %d, destination: %c\n", robots[i].name, robots[i].item_number, robots[i].destination);
     }
 
     /*
@@ -407,7 +399,6 @@ void run_automated_warehouse(char **argv)
 
     // 중심제어 시스템
     threads[0] = thread_create("CNT", 0, &cnt, NULL);
-    printf("create cnt thread\n");
 
     // 직접 로봇을 움직일 thread들
     for (int i = 0; i < robot_num; i++)
@@ -416,6 +407,5 @@ void run_automated_warehouse(char **argv)
         *arg = i;
 
         threads[i + 1] = thread_create(robot_name[i], 0, &thread_action, arg);
-        printf("create robot thread %d\n", i);
     }
 }
