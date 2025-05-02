@@ -252,8 +252,6 @@ void thread_action(void *aux)
             boxes_from_central_control_node[idx].dirtyBit = 0;
             __sync_synchronize();
 
-            printf("%d robot은 %c로 이동하라고 명령받음.\n", idx + 1, direction);
-
             /*
              * cnt가 알려준 방향으로 이동(by cmd)
              */
