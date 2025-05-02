@@ -83,7 +83,7 @@ void check_moving_item(bool *moving_item)
     {
         if (robots[i].is_finished)
             continue;
-        if (robots[i].row == 5 && robots[i].col == 5)
+        if (robots[i].row == ROW_W && robots[i].col == COL_W)
             continue;
 
         moving_item[robots[i].item_number - 1] = true;
@@ -93,8 +93,6 @@ void check_moving_item(bool *moving_item)
 // central control node thread
 void cnt()
 {
-    printf("cnt executed\n");
-
     int **robot_position = malloc(sizeof(int *) * robot_num);
     for (int i = 0; i < robot_num; i++)
         robot_position[i] = malloc(sizeof(int) * 2);
@@ -111,8 +109,6 @@ void cnt()
         // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
         if (robot_all_move())
         {
-            timer_sleep(100); // 실행 전 항상 1초 대기
-
             // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
             if (transport_over())
             {
@@ -157,15 +153,6 @@ void cnt()
                     }
                 }
 
-                // 시작 지점의 robot 중 해당 item을 움직이는 로봇이 있으면 X
-                if (row == 5 && col == 5)
-                {
-                    if (moving_item[robots[i].item_number - 1])
-                        continue;
-                    else
-                        moving_item[robots[i].item_number - 1] = true;
-                }
-
                 char direction;
 
                 if (robots[i].current_payload != 0)
@@ -175,6 +162,15 @@ void cnt()
 
                 if (robots[i].is_finished)
                     direction = 'X';
+
+                // 시작 지점의 robot 중 해당 item을 움직이는 로봇이 있으면 X
+                if (row == ROW_W && col == COL_W)
+                {
+                    if (moving_item[robots[i].item_number - 1])
+                        direction = 'X';
+                    else
+                        moving_item[robots[i].item_number - 1] = true;
+                }
 
                 struct message msg =
                     {
@@ -247,8 +243,7 @@ void thread_action(void *aux)
     {
         int idx = *((int *)aux);
 
-        char direction = 0;
-        direction = boxes_from_central_control_node[idx].msg.cmd;
+        char direction = boxes_from_central_control_node[idx].msg.cmd;
         boxes_from_central_control_node[idx].dirtyBit = 0;
         __sync_synchronize();
 
