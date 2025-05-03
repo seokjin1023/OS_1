@@ -380,6 +380,16 @@ void run_automated_warehouse(char **argv)
     {
         int item_number = num_place_pair[i][0] - '0';
         char destination = num_place_pair[i][1];
+        if (item_number < 1 || item_number > 7)
+        {
+            printf("Error: item number is out of range(1~7)\n");
+            shutdown_power_off();
+        }
+        if (!(destination == 'A' || destination == 'B' || destination == 'C'))
+        {
+            printf("Error: destination is out of range(A~C)\n");
+            shutdown_power_off();
+        }
         setRobot(&robots[i], robot_name[i], ROW_W, COL_W, 1, 0, item_number, destination);
     }
 
