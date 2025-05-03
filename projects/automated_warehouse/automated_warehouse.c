@@ -356,7 +356,7 @@ void run_automated_warehouse(char **argv)
     if (robot_num == -1)
     {
         printf("Error: Invalid robot num(argv[1])");
-        return;
+        shutdown_power_off();
     }
     // robot의 message box들 생성
     init_message_boxes(robot_num);
@@ -366,7 +366,7 @@ void run_automated_warehouse(char **argv)
     if (pair_num != robot_num)
     {
         printf("Error: pair는 robot과 1:1 매칭되어야 한다.");
-        return;
+        shutdown_power_off();
     }
 
     robots = malloc(sizeof(struct robot) * robot_num);
