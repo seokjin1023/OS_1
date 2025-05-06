@@ -97,106 +97,96 @@ void cnt()
     for (int i = 0; i < robot_num; i++)
         robot_position[i] = malloc(sizeof(int) * 2);
 
-    bool moving_item[7];
-    for (int i = 0; i < 7; i++)
-        moving_item[i] = false;
-
     while (1)
     {
         // semaphore로 대기했다가 로봇이 데이터를 보낼 때마다 확인
-        sema_down(&cnt_sema);
+        for(int i = 0; i < robot_num; i++)
+            sema_down(&cnt_sema);
 
-        // check_message가 robot_num과 같을 때 즉, 모두 block되었을 때
-        if (robot_all_move())
+        bool moving_item[7] = {false};
+
+        ASSERT(robot_all_move());
+        // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
+        if (transport_over())
         {
-            // 만약 모든 로봇이 운송을 끝냈다면 종료(하역 장소에 존재)
-            if (transport_over())
-            {
-                printf("is over\n");
-                shutdown_power_off();
-            }
-
-            // 로봇의 위치들이 어디인지 저장
-            get_robot_position(robot_position);
-
-            // 로봇의 위치 모두 확인 후 print_map 호출
-            print_map(robots, robot_num);
-
-            // 현재 로봇들이 어떤 물건을 배송하고 있는지 확인
-            check_moving_item(moving_item);
-
-            /*
-             * 로봇의 위치를 통해 움직일 위치 지정
-             *
-             * 유의 사항
-             * 1. 물건을 받는 위치(숫자)에 로봇이 존재할 경우
-             *    그 바로 위 or 아래에 로봇이 오지 못하도록 한다.
-             *
-             * message_box에 덧씌우기
-             */
-            for (int i = 0; i < robot_num; i++)
-            {
-                int row = robots[i].row;
-                int col = robots[i].col;
-                for (int j = 0; j < 7; j++)
-                {
-                    if (row == item_positions[j][0] && col == item_positions[j][1])
-                    {
-                        robots[i].current_payload = 1;
-                    }
-                }
-                for (int j = 0; j < 3; j++)
-                {
-                    if (row == finish_positions[j][0] && col == finish_positions[j][1])
-                    {
-                        robots[i].is_finished = true;
-                    }
-                }
-
-                char direction;
-
-                if (robots[i].current_payload != 0)
-                    direction = down_direction_map[robots[i].item_number - 1][alphabet_to_index(robots[i].destination)][robots[i].row][robots[i].col];
-                else
-                    direction = up_direction_map[robots[i].item_number - 1][robots[i].row][robots[i].col];
-
-                if (robots[i].is_finished)
-                    direction = 'X';
-
-                // 시작 지점의 robot 중 해당 item을 움직이는 로봇이 있으면 X
-                if (row == ROW_W && col == COL_W)
-                {
-                    if (moving_item[robots[i].item_number - 1])
-                        direction = 'X';
-                    else
-                        moving_item[robots[i].item_number - 1] = true;
-                }
-
-                struct message msg =
-                    {
-                        robots[i].row,
-                        robots[i].col,
-                        robots[i].current_payload,
-                        robots[i].required_payload,
-                        direction // direction만 의미 O
-                    };
-                boxes_from_central_control_node[i].msg = msg;
-                boxes_from_central_control_node[i].dirtyBit = 1;
-            }
-
-            for (int i = 0; i < 7; i++)
-                moving_item[i] = false;
-
-            unblock_threads();
-            increase_step();
+            printf("is over\n");
+            shutdown_power_off();
         }
-    }
 
-    for (int i = 0; i < robot_num; i++)
-    {
-        free(robot_position[i]);
+        // 로봇의 위치들이 어디인지 저장
+        get_robot_position(robot_position);
+
+        // 로봇의 위치 모두 확인 후 print_map 호출
+        print_map(robots, robot_num);
+
+        // 현재 로봇들이 어떤 물건을 배송하고 있는지 확인
+        check_moving_item(moving_item);
+
+        /*
+            * 로봇의 위치를 통해 움직일 위치 지정
+            *
+            * 유의 사항
+            * 1. 물건을 받는 위치(숫자)에 로봇이 존재할 경우
+            *    그 바로 위 or 아래에 로봇이 오지 못하도록 한다.
+            *
+            * message_box에 덧씌우기
+            */
+        for (int i = 0; i < robot_num; i++)
+        {
+            int row = robots[i].row;
+            int col = robots[i].col;
+            for (int j = 0; j < 7; j++)
+            {
+                if (row == item_positions[j][0] && col == item_positions[j][1])
+                {
+                    robots[i].current_payload = 1;
+                }
+            }
+            for (int j = 0; j < 3; j++)
+            {
+                if (row == finish_positions[j][0] && col == finish_positions[j][1])
+                {
+                    robots[i].is_finished = true;
+                }
+            }
+
+            char direction;
+
+            if (robots[i].current_payload != 0)
+                direction = down_direction_map[robots[i].item_number - 1][alphabet_to_index(robots[i].destination)][robots[i].row][robots[i].col];
+            else
+                direction = up_direction_map[robots[i].item_number - 1][robots[i].row][robots[i].col];
+
+            if (robots[i].is_finished)
+                direction = 'X';
+
+            // 시작 지점의 robot 중 해당 item을 움직이는 로봇이 있으면 X
+            if (row == ROW_W && col == COL_W)
+            {
+                if (moving_item[robots[i].item_number - 1])
+                    direction = 'X';
+                else
+                    moving_item[robots[i].item_number - 1] = true;
+            }
+
+            struct message msg =
+                {
+                    robots[i].row,
+                    robots[i].col,
+                    robots[i].current_payload,
+                    robots[i].required_payload,
+                    direction // direction만 의미 O
+                };
+            boxes_from_central_control_node[i].msg = msg;
+            boxes_from_central_control_node[i].dirtyBit = 1;
+        }
+
+        for (int i = 0; i < 7; i++)
+            moving_item[i] = false;
+
+        unblock_threads();
+        increase_step();
     }
-    free(robot_position);
 }
 
 // 로봇이 이동할 위치에 있는지 확인
